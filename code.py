@@ -4,6 +4,7 @@ import digitalio
 import random
 import time
 from adafruit_neotrellis.neotrellis import NeoTrellis
+from rainbowio import colorwheel
 
 
 # some color definitions
@@ -15,6 +16,14 @@ CYAN = (0, 255, 255)
 BLUE = (0, 0, 255)
 PURPLE = (180, 0, 255)
 RGB = [RED, GREEN, BLUE]
+
+def blink(event):
+    # turn the LED on when a rising edge is detected
+    if event.edge == NeoTrellis.EDGE_RISING:
+        trellis.pixels[event.number] = colorwheel(random.randrange(256))
+    # turn the LED off when a falling edge is detected
+    elif event.edge == NeoTrellis.EDGE_FALLING:
+        trellis.pixels[event.number] = OFF
 
 # Setup interrupt (INT) pin
 int_pin = digitalio.DigitalInOut(board.D4)
@@ -28,21 +37,6 @@ print(f"{i2c_bus.scan()=}")
 #create the trellis
 trellis = NeoTrellis(i2c_bus, addr=0x2E)
 
-trellis.pixels[0] = RED
-trellis.pixels[1] = GREEN
-trellis.pixels[2] = BLUE
-trellis.pixels[3] = YELLOW
-trellis.pixels[4] = PURPLE
-
-def blink(event):
-    # turn the LED on when a rising edge is detected
-    if event.edge == NeoTrellis.EDGE_RISING:
-        color = (random.randrange(256), random.randrange(256), random.randrange(256))
-        trellis.pixels[event.number] = color
-    # turn the LED off when a falling edge is detected
-    elif event.edge == NeoTrellis.EDGE_FALLING:
-        trellis.pixels[event.number] = OFF
-
 for i in range(16):
     # activate rising edge events on all keys
     trellis.activate_key(i, NeoTrellis.EDGE_RISING)
@@ -52,7 +46,6 @@ for i in range(16):
     trellis.callbacks[i] = blink
 
     # cycle the LEDs on startup
-  
     trellis.pixels[i] = RGB[i%3]
     time.sleep(0.05)
 
@@ -60,7 +53,6 @@ for i in range(16):
     trellis.pixels[i] = OFF
     time.sleep(0.05)
     
-
 while True:
     # call the sync function call any triggered callbacks
     trellis.sync()
