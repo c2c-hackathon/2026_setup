@@ -18,12 +18,16 @@ PURPLE = (180, 0, 255)
 RGB = [RED, GREEN, BLUE]
 
 def blink(event):
+    # event definition: https://github.com/adafruit/Adafruit_CircuitPython_seesaw/blob/main/adafruit_seesaw/keypad.py#L34
     # turn the LED on when a rising edge is detected
     if event.edge == NeoTrellis.EDGE_RISING:
-        trellis.pixels[event.number] = colorwheel(random.randrange(256))
+        color = colorwheel(random.randrange(256))
+        trellis.pixels[event.number] = color
+        print(f"Button {event.number} pressed. Turning on color= 0x{color:06X}")
     # turn the LED off when a falling edge is detected
     elif event.edge == NeoTrellis.EDGE_FALLING:
         trellis.pixels[event.number] = OFF
+        print(f"Button {event.number} released")
 
 # Setup interrupt (INT) pin
 int_pin = digitalio.DigitalInOut(board.D4)
