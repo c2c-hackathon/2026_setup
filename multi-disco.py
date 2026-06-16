@@ -40,7 +40,15 @@ for y in range(8):
         trellis.set_callback(x, y, intensity)
 
 while True:
-    trellis.sync()
-    for y in range(8):
-        for x in range(8):
-            trellis.color(x, y, colorwheel(random.randrange(256)))
+    try:
+        trellis.sync()
+        for y in range(8):
+            for x in range(8):
+                trellis.color(x, y, colorwheel(random.randrange(256)))
+    except KeyboardInterrupt:
+        # Turn off all LEDs
+        for y in range(8):
+            for x in range(8):
+                trellis.color(x, y, OFF)
+        exit()
+

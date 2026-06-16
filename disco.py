@@ -34,7 +34,13 @@ for i in range(16):
     trellis.callbacks[i] = brightness
 
 while True:
-    trellis.sync()
-    for i in range(16):
-        trellis.pixels[i] = colorwheel(random.randrange(256))
+    try:
+        trellis.sync()
+        for i in range(16):
+            trellis.pixels[i] = colorwheel(random.randrange(256))
+    except KeyboardInterrupt:
+        # Turn off all LEDs
+        for i in range(16):
+            trellis.pixels[i] = OFF
+        exit()
 
