@@ -24,12 +24,23 @@ trelli = [
 
 trellis = MultiTrellis(trelli)
 
+def intensity(xcoord, ycoord, edge):
+    # Turn the LED on when a rising edge is detected
+    if edge == NeoTrellis.EDGE_RISING:
+        brightness = (8 - ycoord) / 8.0
+        trellis.brightness = brightness
+        print(f"{brightness=:.3f}  x={xcoord}, y={ycoord} pressed")
+
 # Turn off all LEDs
 for y in range(8):
     for x in range(8):
         trellis.color(x, y, OFF)
+        # Activate rising edge events on all keys
+        trellis.activate_key(x, y, NeoTrellis.EDGE_RISING)
+        trellis.set_callback(x, y, intensity)
 
 while True:
+    trellis.sync()
     for y in range(8):
         for x in range(8):
             trellis.color(x, y, colorwheel(random.randrange(256)))
