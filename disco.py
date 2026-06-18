@@ -40,6 +40,7 @@ while True:
             trellis.pixels[i] = colorwheel(random.randrange(256))
     except KeyboardInterrupt:
         # Turn off all LEDs
+        print("\nLeaving the disco...")
         for i in range(16):
             trellis.pixels[i] = OFF
         exit()
