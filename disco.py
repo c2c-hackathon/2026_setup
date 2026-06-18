@@ -16,7 +16,7 @@ i2c_bus = busio.I2C(board.SCL, board.SDA)
 print(f"{i2c_bus.scan()=}")
 
 # Create the trellis
-trellis = NeoTrellis(i2c_bus, addr=0x2E)
+trellis = NeoTrellis(i2c_bus, addr=0x2E, auto_write=False)
 
 def brightness(event):
     # Increase brightness
@@ -38,10 +38,12 @@ while True:
         trellis.sync()
         for i in range(16):
             trellis.pixels[i] = colorwheel(random.randrange(256))
+        trellis.show()
     except KeyboardInterrupt:
         # Turn off all LEDs
         print("\nLeaving the disco...")
         for i in range(16):
             trellis.pixels[i] = OFF
+        trellis.show()
         exit()
 

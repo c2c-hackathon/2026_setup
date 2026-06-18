@@ -18,8 +18,8 @@ print(f"{i2c_bus.scan()=}")
 
 # This is for a 2x2 array of NeoTrellis boards:
 trelli = [
-    [NeoTrellis(i2c_bus, False, addr=0x2E), NeoTrellis(i2c_bus, False, addr=0x2F)],
-    [NeoTrellis(i2c_bus, False, addr=0x30), NeoTrellis(i2c_bus, False, addr=0x31)],
+    [NeoTrellis(i2c_bus, False, addr=0x2E, auto_write=False), NeoTrellis(i2c_bus, False, addr=0x2F, auto_write=False)],
+    [NeoTrellis(i2c_bus, False, addr=0x30, auto_write=False), NeoTrellis(i2c_bus, False, addr=0x31, auto_write=False)],
 ]
 
 trellis = MultiTrellis(trelli)
@@ -45,11 +45,13 @@ while True:
         for y in range(8):
             for x in range(8):
                 trellis.color(x, y, colorwheel(random.randrange(256)))
+        trellis.show()
     except KeyboardInterrupt:
         # Turn off all LEDs
         print("\nLeaving the disco...")
         for y in range(8):
             for x in range(8):
                 trellis.color(x, y, OFF)
+        trellis.show()
         exit()
 
