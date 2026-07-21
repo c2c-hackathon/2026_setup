@@ -12,6 +12,7 @@ PLAYER_2 = 1
 NUMBER_OF_GAME_ROWS = 6
 NUMBER_OF_GAME_COLUMNS = 8
 ROW_OFFSET = 8 - NUMBER_OF_GAME_ROWS
+NUMBER_TO_WIN = 7
 
 class ConnectFour(NeoTrellisGame):
 
@@ -129,7 +130,7 @@ class ConnectFour(NeoTrellisGame):
     def check_for_horizontal_win(self, row, col):
         current_col = col
         cells = []
-        while len(cells) <=4 and current_col < NUMBER_OF_GAME_COLUMNS:
+        while len(cells) <=NUMBER_TO_WIN and current_col < NUMBER_OF_GAME_COLUMNS:
             if self.game_state[row][current_col] == self.current_player:
                 cells.append((row, current_col))
                 current_col += 1
@@ -141,7 +142,7 @@ class ConnectFour(NeoTrellisGame):
     def check_for_vertical_win(self, row, col):
         current_row = row
         cells = []
-        while len(cells) <=4 and current_row < NUMBER_OF_GAME_ROWS:
+        while len(cells) <=NUMBER_TO_WIN and current_row < NUMBER_OF_GAME_ROWS:
             if self.game_state[current_row][col] == self.current_player:
                 cells.append((current_row, col))
                 current_row += 1
@@ -154,7 +155,7 @@ class ConnectFour(NeoTrellisGame):
         current_row = row
         current_col = col
         cells = []
-        while len(cells) <=4 and current_row < NUMBER_OF_GAME_ROWS and current_col < NUMBER_OF_GAME_COLUMNS:
+        while len(cells) <=NUMBER_TO_WIN and current_row < NUMBER_OF_GAME_ROWS and current_col < NUMBER_OF_GAME_COLUMNS:
             if self.game_state[current_row][current_col] == self.current_player:
                 cells.append((current_row, current_col))
                 current_row += 1
@@ -168,7 +169,7 @@ class ConnectFour(NeoTrellisGame):
         current_row = row
         current_col = col
         cells = []
-        while len(cells) <=4 and current_row >= 0 and current_col < NUMBER_OF_GAME_COLUMNS:
+        while len(cells) <=NUMBER_TO_WIN and current_row >= 0 and current_col < NUMBER_OF_GAME_COLUMNS:
             if self.game_state[current_row][current_col] == self.current_player:
                 cells.append((current_row, current_col))
                 current_row -= 1
@@ -185,7 +186,7 @@ class ConnectFour(NeoTrellisGame):
                 if self.game_state[row_index][col_index] == self.current_player:
                     for f in win_checkers:
                         longest_sequence = f(row_index, col_index)
-                        if len(longest_sequence) >= 4: 
+                        if len(longest_sequence) >= NUMBER_TO_WIN: 
                             return True, longest_sequence
         return False, []
 
