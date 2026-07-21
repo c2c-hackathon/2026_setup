@@ -3,7 +3,6 @@ from adafruit_neotrellis.multitrellis import MultiTrellis
 from adafruit_neotrellis.neotrellis import NeoTrellis #TODO: Make this import better
 
 
-
 # Represents the state of the board in the game_state matrix
 EMPTY = -1
 PLAYER_1 = 0
@@ -19,14 +18,27 @@ class ConnectFour(NeoTrellisGame):
     def __init__(self):
         super().__init__()
         self.reset_game()
-        self.register_callbacks()
+        self.register_two_player_callbacks()
     
 
-    def register_callbacks(self):
+    def register_two_player_callbacks(self):
         for col in range(NUMBER_OF_GAME_COLUMNS):
             self.board.set_callback(col, 0, self.handle_button_event)
             self.board.activate_key(col, 0, NeoTrellis.EDGE_RISING)
 
+
+    def register_end_game_callbacks(self):
+        for col in range(NUMBER_OF_GAME_COLUMNS):
+            self.board.set_callback(col, 0, None)
+        self.board.set_callback(7, 0, self.reset_game_from_callback)
+
+
+    def register_callbacks(self):
+        pass
+    
+    def reset_game_from_callback(self, x, y, edge):
+        self.reset_game()
+        self.register_two_player_callbacks()
 
     def reset_game(self):
         self.game_state = [] # Zero indexed: Row, Column
@@ -53,15 +65,14 @@ class ConnectFour(NeoTrellisGame):
     def drop_piece(self, col: int, player: int):
         self.game_state[self.find_lowest_empty_row(col)][col] = self.current_player
         self.update_board_colors()
-        win = self.check_win()
+        win, winning_sequence = self.check_win()
         tie = self.board_is_full() 
         if not win and not tie:
             self.switch_player()
         elif win:
-            print(f"Winner! {self.current_player}")        
+            self.show_winner(winning_sequence) 
         else:
-            print(f"Tie game!")
-
+            self.show_tie_game()
 
     def switch_player(self):
         if self.current_player == PLAYER_1:
@@ -116,81 +127,108 @@ class ConnectFour(NeoTrellisGame):
 
     
     def check_for_horizontal_win(self, row, col):
-        count = 0
         current_col = col
-        while count <=4 and current_col < NUMBER_OF_GAME_COLUMNS:
+        cells = []
+        while len(cells) <=4 and current_col < NUMBER_OF_GAME_COLUMNS:
             if self.game_state[row][current_col] == self.current_player:
-                count += 1
+                cells.append((row, current_col))
                 current_col += 1
             else:
                 break
-        return count >= 4
+        return cells
 
 
     def check_for_vertical_win(self, row, col):
-        count = 0
         current_row = row
-        while count <=4 and current_row < NUMBER_OF_GAME_ROWS:
+        cells = []
+        while len(cells) <=4 and current_row < NUMBER_OF_GAME_ROWS:
             if self.game_state[current_row][col] == self.current_player:
-                count += 1
+                cells.append((current_row, col))
                 current_row += 1
             else:
                 break
-        return count >= 4
+        return cells
 
     
     def check_for_diagonal_win_1(self, row, col):
-        count = 0
         current_row = row
         current_col = col
-        while count <=4 and current_row < NUMBER_OF_GAME_ROWS and current_col < NUMBER_OF_GAME_COLUMNS:
+        cells = []
+        while len(cells) <=4 and current_row < NUMBER_OF_GAME_ROWS and current_col < NUMBER_OF_GAME_COLUMNS:
             if self.game_state[current_row][current_col] == self.current_player:
-                count += 1
+                cells.append((current_row, current_col))
                 current_row += 1
                 current_col += 1
             else:
                 break
-        return count >= 4
+        return cells
 
     
     def check_for_diagonal_win_2(self, row, col):
-        count = 0
         current_row = row
         current_col = col
-        while count <=4 and current_row >= 0 and current_col < NUMBER_OF_GAME_COLUMNS:
+        cells = []
+        while len(cells) <=4 and current_row >= 0 and current_col < NUMBER_OF_GAME_COLUMNS:
             if self.game_state[current_row][current_col] == self.current_player:
-                count += 1
+                cells.append((current_row, current_col))
                 current_row -= 1
                 current_col += 1
             else:
                 break
-        return count >= 4
+        return cells
 
 
     def check_win(self):
+        win_checkers = [self.check_for_horizontal_win, self.check_for_vertical_win, self.check_for_diagonal_win_1, self.check_for_diagonal_win_2]
         for row_index in range(NUMBER_OF_GAME_ROWS):
             for col_index in range(NUMBER_OF_GAME_COLUMNS):
                 if self.game_state[row_index][col_index] == self.current_player:
-                    if self.check_for_horizontal_win(row_index, col_index) or self.check_for_vertical_win(row_index, col_index) or self.check_for_diagonal_win_1(row_index, col_index) or self.check_for_diagonal_win_2(row_index, col_index):
+                    for f in win_checkers:
+                        longest_sequence = f(row_index, col_index)
+                        if len(longest_sequence) >= 4: 
+                            return True, longest_sequence
+        return False, []
 
-                        return True
-        return False
 
-
-    def get_winning_cells(self, player: int):
+    def get_winning_cells(self):
         pass
 
+    def blink_board(self):
+        for i in range(10):
+            for row in range(NUMBER_OF_GAME_ROWS):
+                for col in range(NUMBER_OF_GAME_COLUMNS):
+                    self.set_cell_color(col, row + ROW_OFFSET, (0,0,0))
+                self.update_display()
+
+            for row in range(NUMBER_OF_GAME_ROWS):
+                for col in range(NUMBER_OF_GAME_COLUMNS):
+                    self.set_cell_color(col, row + ROW_OFFSET, self.get_player_color(self.game_state[row][col]))
+                self.update_display()
 
     def highlight_winning_sequence(self, cells):
-        pass
+        for i in range(10):
+            for cell in cells:
+                self.set_cell_color(cell[1], cell[0] + ROW_OFFSET, (40, 255, 40))
+                self.update_display()
+            for cell in cells:
+                self.set_cell_color(cell[1], cell[0] + ROW_OFFSET, self.get_player_color(self.current_player))
+                self.update_display()
 
 
-    def show_winner(self, player: int):
-        pass
+    def show_winner(self, winning_sequence):
+        self.register_end_game_callbacks()
+        for col in range(NUMBER_OF_GAME_COLUMNS):
+            self.set_cell_color(col, 0, (0, 0, 0))
+        self.set_cell_color(7, 0, (40, 255, 40))
+        self.highlight_winning_sequence(winning_sequence)    
 
 
     def show_tie_game(self):
-        pass
+        self.register_end_game_callbacks()
+        for col in range(NUMBER_OF_GAME_COLUMNS):
+            self.set_cell_color(col, 0, (0, 0, 0))
+        self.set_cell_color(7, 0, (40, 255, 40))
+        self.blink_board()
 
 
 

@@ -1,7 +1,5 @@
 from ConnectFour import ConnectFour
 from NeoTrellisGame import NeoTrellisGame
-import time
-
 
 game = ConnectFour()
 game.update_display()
