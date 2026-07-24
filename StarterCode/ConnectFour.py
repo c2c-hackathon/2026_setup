@@ -32,10 +32,7 @@ class ConnectFour(NeoTrellisGame):
         for col in range(NUMBER_OF_GAME_COLUMNS):
             self.board.set_callback(col, 0, None)
         self.board.set_callback(7, 0, self.reset_game_from_callback)
-
-
-    def register_callbacks(self):
-        pass
+        self.board.activate_key(7, 0, NeoTrellis.EDGE_RISING)
     
     def reset_game_from_callback(self, x, y, edge):
         self.reset_game()
@@ -86,7 +83,11 @@ class ConnectFour(NeoTrellisGame):
 
     def show_current_player(self):
         for col in range(NUMBER_OF_GAME_COLUMNS):
-            self.set_cell_color(col, 0, self.get_player_color(self.current_player))
+            if self.is_column_full(col):
+                self.set_cell_color(col, 0, (0,0,0))
+                self.board.activate_key(col, 0, NeoTrellis.EDGE_RISING, False)
+            else:
+                self.set_cell_color(col, 0, self.get_player_color(self.current_player))
         self.update_display()
 
 
@@ -130,7 +131,7 @@ class ConnectFour(NeoTrellisGame):
     def check_for_horizontal_win(self, row, col):
         current_col = col
         cells = []
-        while len(cells) <=NUMBER_TO_WIN and current_col < NUMBER_OF_GAME_COLUMNS:
+        while current_col < NUMBER_OF_GAME_COLUMNS:
             if self.game_state[row][current_col] == self.current_player:
                 cells.append((row, current_col))
                 current_col += 1
@@ -142,7 +143,7 @@ class ConnectFour(NeoTrellisGame):
     def check_for_vertical_win(self, row, col):
         current_row = row
         cells = []
-        while len(cells) <=NUMBER_TO_WIN and current_row < NUMBER_OF_GAME_ROWS:
+        while current_row < NUMBER_OF_GAME_ROWS:
             if self.game_state[current_row][col] == self.current_player:
                 cells.append((current_row, col))
                 current_row += 1
@@ -155,7 +156,7 @@ class ConnectFour(NeoTrellisGame):
         current_row = row
         current_col = col
         cells = []
-        while len(cells) <=NUMBER_TO_WIN and current_row < NUMBER_OF_GAME_ROWS and current_col < NUMBER_OF_GAME_COLUMNS:
+        while current_row < NUMBER_OF_GAME_ROWS and current_col < NUMBER_OF_GAME_COLUMNS:
             if self.game_state[current_row][current_col] == self.current_player:
                 cells.append((current_row, current_col))
                 current_row += 1
@@ -169,7 +170,7 @@ class ConnectFour(NeoTrellisGame):
         current_row = row
         current_col = col
         cells = []
-        while len(cells) <=NUMBER_TO_WIN and current_row >= 0 and current_col < NUMBER_OF_GAME_COLUMNS:
+        while current_row >= 0 and current_col < NUMBER_OF_GAME_COLUMNS:
             if self.game_state[current_row][current_col] == self.current_player:
                 cells.append((current_row, current_col))
                 current_row -= 1
