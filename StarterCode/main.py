@@ -14,3 +14,4 @@ while True:
                 game.set_cell_color(x, y, [0, 0, 0])
         game.update_display()
         exit()  # quit
+

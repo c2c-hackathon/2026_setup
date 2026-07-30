@@ -173,7 +173,6 @@ class ConnectFour(NeoTrellisGame):
                             return True, longest_sequence
         return False, []
 
-
     def get_winning_cells(self):
         pass
 
