@@ -164,8 +164,8 @@ class ConnectFour(NeoTrellisGame):
 
     def check_win(self):
         win_checkers = [self.check_for_horizontal_win, self.check_for_vertical_win, self.check_for_diagonal_win_1, self.check_for_diagonal_win_2]
-        for row_index in range(NUMBER_OF_GAME_ROWS):
-            for col_index in range(NUMBER_OF_GAME_COLUMNS):
+        for col_index in range(NUMBER_OF_GAME_COLUMNS):
+            for row_index in range(NUMBER_OF_GAME_ROWS):
                 if self.game_state[row_index][col_index] == self.current_player:
                     for f in win_checkers:
                         longest_sequence = f(row_index, col_index)
