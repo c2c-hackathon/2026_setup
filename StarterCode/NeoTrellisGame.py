@@ -57,4 +57,10 @@ class NeoTrellisGame:
     def update_display(self):
         self.board.show()
 
-        
+    def clear_board(self):
+        """Clears board by turning off all LEDs"""
+        for x in range(8):
+            for y in range(8):
+                self.set_cell_color(x, y, [0, 0, 0])
+        self.update_display()
+

@@ -9,9 +9,6 @@ while True:
     except KeyboardInterrupt:
         # clear board
         print("\nClosing game...")
-        for x in range(8):
-            for y in range(8):
-                game.set_cell_color(x, y, [0, 0, 0])
-        game.update_display()
+        game.clear_board()
         exit()  # quit
 
