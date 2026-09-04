@@ -1,12 +1,15 @@
+import enum
+
 from NeoTrellisGame import NeoTrellisGame
 from adafruit_neotrellis.multitrellis import MultiTrellis
 from adafruit_neotrellis.neotrellis import NeoTrellis #TODO: Make this import better
 
 
 # Represents the state of the board in the game_state matrix
-EMPTY = -1
-PLAYER_1 = 0
-PLAYER_2 = 1
+class CellState(enum.IntEnum):
+    EMPTY = -1
+    PLAYER_1 = 0
+    PLAYER_2 = 1
 
 # Row is the NeoTrellis Y and Col is the NeoTrellis X
 NUMBER_OF_GAME_ROWS = 6
@@ -38,10 +41,10 @@ class ConnectFour(NeoTrellisGame):
 
     def reset_game(self):
         self.game_state = [] # Zero indexed: Row, Column
-        self.current_player = PLAYER_1
+        self.current_player = CellState.PLAYER_1
 
         for i in range(NUMBER_OF_GAME_ROWS):
-            self.game_state.append([EMPTY] * NUMBER_OF_GAME_COLUMNS)
+            self.game_state.append([CellState.EMPTY] * NUMBER_OF_GAME_COLUMNS)
         self.show_current_player()
         self.update_board_colors()
   
@@ -51,12 +54,12 @@ class ConnectFour(NeoTrellisGame):
 
     def find_lowest_empty_row(self, col: int):
         for row_index in range(NUMBER_OF_GAME_ROWS):
-            if self.game_state[NUMBER_OF_GAME_ROWS - row_index - 1][col] == EMPTY:
+            if self.game_state[NUMBER_OF_GAME_ROWS - row_index - 1][col] == CellState.EMPTY:
                 return NUMBER_OF_GAME_ROWS - row_index - 1
         return -1 # -1 means the column is full
 
     def drop_piece(self, col: int, player: int):
-        self.game_state[self.find_lowest_empty_row(col)][col] = self.current_player
+        self.game_state[self.find_lowest_empty_row(col)][col] = CellState(self.current_player)
         self.update_board_colors()
         win, winning_sequence = self.check_win()
         tie = self.board_is_full() 
@@ -68,10 +71,10 @@ class ConnectFour(NeoTrellisGame):
             self.show_tie_game()
 
     def switch_player(self):
-        if self.current_player == PLAYER_1:
-            self.current_player = PLAYER_2
+        if self.current_player == CellState.PLAYER_1:
+            self.current_player = CellState.PLAYER_2
         else:
-            self.current_player = PLAYER_1
+            self.current_player = CellState.PLAYER_1
 
         self.show_current_player()
 
@@ -98,9 +101,9 @@ class ConnectFour(NeoTrellisGame):
         self.update_display()
 
     def get_player_color(self, player: int):
-        if player == PLAYER_1:
+        if player == CellState.PLAYER_1:
             return (255, 40, 40)
-        elif player == PLAYER_2:
+        elif player == CellState.PLAYER_2:
             return (40, 40, 255)
         else:
             return (50, 50, 50)
@@ -110,7 +113,7 @@ class ConnectFour(NeoTrellisGame):
 
     def is_column_full(self, col: int) -> bool:
         for row in self.game_state:
-            if row[col] == EMPTY:
+            if row[col] == CellState.EMPTY:
                 return False
         return True
 
