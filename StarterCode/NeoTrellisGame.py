@@ -11,14 +11,17 @@ from adafruit_neotrellis.neotrellis import NeoTrellis
 class AbstractNeoTrellisGame(abc.ABC):
     @abc.abstractmethod
     def init_hardware(self):
+        """Initializes the LED board."""
         pass
 
     @abc.abstractmethod
     def set_cell_color(self, x: int, y: int, color: tuple[int, int, int]) -> None:
+        """Sets the color of a cell at the given coordinates."""
         pass
 
     @abc.abstractmethod
     def update_display(self):
+        """Updates the LED display to reflect any changes made to cell colors."""
         pass
 
     @abc.abstractmethod
