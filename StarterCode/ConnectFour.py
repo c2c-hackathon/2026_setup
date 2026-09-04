@@ -1,6 +1,7 @@
 import enum
+import typing
 
-from NeoTrellisGame import NeoTrellisGame
+from NeoTrellisGame import NeoTrellisGame, AbstractNeoTrellisGame
 from adafruit_neotrellis.multitrellis import MultiTrellis
 from adafruit_neotrellis.neotrellis import NeoTrellis #TODO: Make this import better
 
@@ -17,23 +18,23 @@ NUMBER_OF_GAME_COLUMNS = 8
 ROW_OFFSET = 8 - NUMBER_OF_GAME_ROWS
 NUMBER_TO_WIN = 4
 
-class ConnectFour(NeoTrellisGame):
-
-    def __init__(self):
+class ConnectFour:
+    def __init__(self, game: typing.Optional[AbstractNeoTrellisGame] = None):
+        self.game = game if game is not None else NeoTrellisGame()
         super().__init__()
         self.reset_game()
         self.register_two_player_callbacks()
     
     def register_two_player_callbacks(self):
         for col in range(NUMBER_OF_GAME_COLUMNS):
-            self.board.set_callback(col, 0, self.handle_button_event)
-            self.board.activate_key(col, 0, NeoTrellis.EDGE_RISING)
+            self.game.board.set_callback(col, 0, self.handle_button_event)
+            self.game.board.activate_key(col, 0, NeoTrellis.EDGE_RISING)
 
     def register_end_game_callbacks(self):
         for col in range(NUMBER_OF_GAME_COLUMNS):
-            self.board.set_callback(col, 0, None)
-        self.board.set_callback(7, 0, self.reset_game_from_callback)
-        self.board.activate_key(7, 0, NeoTrellis.EDGE_RISING)
+            self.game.board.set_callback(col, 0, None)
+        self.game.board.set_callback(7, 0, self.reset_game_from_callback)
+        self.game.board.activate_key(7, 0, NeoTrellis.EDGE_RISING)
     
     def reset_game_from_callback(self, x, y, edge):
         self.reset_game()
@@ -62,7 +63,7 @@ class ConnectFour(NeoTrellisGame):
         self.game_state[self.find_lowest_empty_row(col)][col] = self.current_player
         self.update_board_colors()
         win, winning_sequence = self.check_win()
-        tie = self.board_is_full() 
+        tie = self.board_is_full()
         if not win and not tie:
             self.switch_player()
         elif win:
@@ -81,11 +82,11 @@ class ConnectFour(NeoTrellisGame):
     def show_current_player(self):
         for col in range(NUMBER_OF_GAME_COLUMNS):
             if self.is_column_full(col):
-                self.set_cell_color(col, 0, (0,0,0))
-                self.board.activate_key(col, 0, NeoTrellis.EDGE_RISING, False)
+                self.game.set_cell_color(col, 0, (0,0,0))
+                self.game.board.activate_key(col, 0, NeoTrellis.EDGE_RISING, False)
             else:
-                self.set_cell_color(col, 0, self.get_player_color(self.current_player))
-        self.update_display()
+                self.game.set_cell_color(col, 0, self.get_player_color(self.current_player))
+        self.game.update_display()
 
     def board_is_full(self) -> bool:
         for col in range(NUMBER_OF_GAME_COLUMNS):
@@ -97,8 +98,8 @@ class ConnectFour(NeoTrellisGame):
         for row_index, row in enumerate(self.game_state):
             for col_index, col in enumerate(row):
 
-                self.set_cell_color(col_index, row_index + ROW_OFFSET, self.get_player_color(col))
-        self.update_display()
+                self.game.set_cell_color(col_index, row_index + ROW_OFFSET, self.get_player_color(col))
+        self.game.update_display()
 
     def get_player_color(self, player: CellState) -> tuple[int, int, int]:
         if player == CellState.PLAYER_1:
@@ -183,34 +184,34 @@ class ConnectFour(NeoTrellisGame):
         for i in range(10):
             for row in range(NUMBER_OF_GAME_ROWS):
                 for col in range(NUMBER_OF_GAME_COLUMNS):
-                    self.set_cell_color(col, row + ROW_OFFSET, (0,0,0))
-                self.update_display()
+                    self.game.set_cell_color(col, row + ROW_OFFSET, (0,0,0))
+                self.game.update_display()
 
             for row in range(NUMBER_OF_GAME_ROWS):
                 for col in range(NUMBER_OF_GAME_COLUMNS):
-                    self.set_cell_color(col, row + ROW_OFFSET, self.get_player_color(self.game_state[row][col]))
-                self.update_display()
+                    self.game.set_cell_color(col, row + ROW_OFFSET, self.get_player_color(self.game_state[row][col]))
+                self.game.update_display()
 
     def highlight_winning_sequence(self, cells):
         for i in range(10):
             for cell in cells:
-                self.set_cell_color(cell[1], cell[0] + ROW_OFFSET, (40, 255, 40))
-                self.update_display()
+                self.game.set_cell_color(cell[1], cell[0] + ROW_OFFSET, (40, 255, 40))
+                self.game.update_display()
             for cell in cells:
-                self.set_cell_color(cell[1], cell[0] + ROW_OFFSET, self.get_player_color(self.current_player))
-                self.update_display()
+                self.game.set_cell_color(cell[1], cell[0] + ROW_OFFSET, self.get_player_color(self.current_player))
+                self.game.update_display()
 
     def show_winner(self, winning_sequence):
         self.register_end_game_callbacks()
         for col in range(NUMBER_OF_GAME_COLUMNS):
-            self.set_cell_color(col, 0, (0, 0, 0))
-        self.set_cell_color(7, 0, (40, 255, 40))
+            self.game.set_cell_color(col, 0, (0, 0, 0))
+        self.game.set_cell_color(7, 0, (40, 255, 40))
         self.highlight_winning_sequence(winning_sequence)    
 
     def show_tie_game(self):
         self.register_end_game_callbacks()
         for col in range(NUMBER_OF_GAME_COLUMNS):
-            self.set_cell_color(col, 0, (0, 0, 0))
-        self.set_cell_color(7, 0, (40, 255, 40))
+            self.game.set_cell_color(col, 0, (0, 0, 0))
+        self.game.set_cell_color(7, 0, (40, 255, 40))
         self.blink_board()
 
