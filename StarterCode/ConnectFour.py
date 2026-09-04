@@ -58,7 +58,7 @@ class ConnectFour(NeoTrellisGame):
                 return NUMBER_OF_GAME_ROWS - row_index - 1
         return -1 # -1 means the column is full
 
-    def drop_piece(self, col: int, player: int):
+    def drop_piece(self, col: int):
         self.game_state[self.find_lowest_empty_row(col)][col] = CellState(self.current_player)
         self.update_board_colors()
         win, winning_sequence = self.check_win()
