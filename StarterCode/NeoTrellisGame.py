@@ -1,13 +1,36 @@
+import abc
+
 import board
+
 import busio
 import digitalio
 from adafruit_neotrellis.multitrellis import MultiTrellis
 from adafruit_neotrellis.neotrellis import NeoTrellis
 
 
-class NeoTrellisGame:
+class AbstractNeoTrellisGame(abc.ABC):
+    @abc.abstractmethod
+    def init_hardware(self):
+        pass
+
+    @abc.abstractmethod
+    def set_cell_color(self, x: int, y: int, color: tuple[int, int, int]) -> None:
+        pass
+
+    @abc.abstractmethod
+    def update_display(self):
+        pass
+
+    @abc.abstractmethod
+    def clear_board(self):
+        """Clears board by turning off all LEDs"""
+        pass
+
+
+class NeoTrellisGame(AbstractNeoTrellisGame):
     
     def __init__(self):
+        self.board = None
         self.init_hardware()
 
     #GIVEN
