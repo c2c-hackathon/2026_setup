@@ -100,7 +100,7 @@ class ConnectFour(NeoTrellisGame):
                 self.set_cell_color(col_index, row_index + ROW_OFFSET, self.get_player_color(col))
         self.update_display()
 
-    def get_player_color(self, player: int):
+    def get_player_color(self, player: CellState) -> tuple[int, int, int]:
         if player == CellState.PLAYER_1:
             return (255, 40, 40)
         elif player == CellState.PLAYER_2:
