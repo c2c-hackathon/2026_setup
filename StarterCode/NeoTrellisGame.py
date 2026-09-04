@@ -79,8 +79,8 @@ class NeoTrellisGame(AbstractNeoTrellisGame):
     #GIVEN
     def set_cell_color(self, x: int, y: int, color: tuple[int, int, int]) -> None:
         self.validate_coordinates(x, y)
-        for rbgValue in color:
-            if rbgValue < 0 or rbgValue > 255:
+        for rgbValue in color:
+            if rgbValue < 0 or rgbValue > 255:
                 raise ValueError(f"All RGB values in the color must be between 0 and 255 inclusive. Was {color}")
         self.board.color(x, y, color)
     
