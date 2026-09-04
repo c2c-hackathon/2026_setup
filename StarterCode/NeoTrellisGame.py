@@ -26,6 +26,11 @@ class AbstractNeoTrellisGame(abc.ABC):
         """Clears board by turning off all LEDs"""
         pass
 
+    @abc.abstractmethod
+    def sync(self):
+        """Read any events from the LED display and call callbacks if any events have occurred."""
+        pass
+
 
 class NeoTrellisGame(AbstractNeoTrellisGame):
     
@@ -87,3 +92,5 @@ class NeoTrellisGame(AbstractNeoTrellisGame):
                 self.set_cell_color(x, y, [0, 0, 0])
         self.update_display()
 
+    def sync(self):
+        self.board.sync()
