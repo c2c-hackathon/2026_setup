@@ -50,7 +50,7 @@ class ConnectFour(NeoTrellisGame):
   
     def handle_button_event(self, x, y, edge):
         if not self.is_column_full(x):
-            self.drop_piece(x, self.current_player)
+            self.drop_piece(x)
 
     def find_lowest_empty_row(self, col: int):
         for row_index in range(NUMBER_OF_GAME_ROWS):
