@@ -1,13 +1,44 @@
+import abc
+
 import board
+
 import busio
 import digitalio
 from adafruit_neotrellis.multitrellis import MultiTrellis
 from adafruit_neotrellis.neotrellis import NeoTrellis
 
 
-class NeoTrellisGame:
+class AbstractNeoTrellisGame(abc.ABC):
+    @abc.abstractmethod
+    def init_hardware(self):
+        """Initializes the LED board."""
+        pass
+
+    @abc.abstractmethod
+    def set_cell_color(self, x: int, y: int, color: tuple[int, int, int]) -> None:
+        """Sets the color of a cell at the given coordinates."""
+        pass
+
+    @abc.abstractmethod
+    def update_display(self):
+        """Updates the LED display to reflect any changes made to cell colors."""
+        pass
+
+    @abc.abstractmethod
+    def clear_board(self):
+        """Clears board by turning off all LEDs"""
+        pass
+
+    @abc.abstractmethod
+    def sync(self):
+        """Read any events from the LED display and call callbacks if any events have occurred."""
+        pass
+
+
+class NeoTrellisGame(AbstractNeoTrellisGame):
     
     def __init__(self):
+        self.board = None
         self.init_hardware()
 
     #GIVEN
@@ -48,8 +79,8 @@ class NeoTrellisGame:
     #GIVEN
     def set_cell_color(self, x: int, y: int, color: tuple[int, int, int]) -> None:
         self.validate_coordinates(x, y)
-        for rbgValue in color:
-            if rbgValue < 0 or rbgValue > 255:
+        for rgbValue in color:
+            if rgbValue < 0 or rgbValue > 255:
                 raise ValueError(f"All RGB values in the color must be between 0 and 255 inclusive. Was {color}")
         self.board.color(x, y, color)
     
@@ -61,6 +92,8 @@ class NeoTrellisGame:
         """Clears board by turning off all LEDs"""
         for x in range(8):
             for y in range(8):
-                self.set_cell_color(x, y, [0, 0, 0])
+                self.set_cell_color(x, y, (0, 0, 0))
         self.update_display()
 
+    def sync(self):
+        self.board.sync()
