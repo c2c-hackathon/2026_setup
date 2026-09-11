@@ -1,4 +1,5 @@
 import abc
+import typing
 
 import board
 
@@ -40,7 +41,7 @@ class AbstractNeoTrellisGame(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def activate_key(self, x: int, y: int, edge) -> None:
+    def activate_key(self, x: int, y: int, edge, enable: typing.Optional[bool] = True) -> None:
         """Activates a key at the given coordinates for a specific edge event."""
         pass
 
@@ -111,5 +112,5 @@ class NeoTrellisGame(AbstractNeoTrellisGame):
     def set_callback(self, x: int, y: int, callback) -> None:
         self._board.set_callback(x, y, callback)
 
-    def activate_key(self, x: int, y: int, edge) -> None:
-        self._board.activate_key(x, y, edge)
+    def activate_key(self, x: int, y: int, edge, enable=True) -> None:
+        self._board.activate_key(x, y, edge, enable)
