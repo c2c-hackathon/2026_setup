@@ -48,7 +48,7 @@ class AbstractNeoTrellisGame(abc.ABC):
 class NeoTrellisGame(AbstractNeoTrellisGame):
     
     def __init__(self):
-        self.board = None
+        self._board = None
         self.init_hardware()
 
     #GIVEN
@@ -60,7 +60,7 @@ class NeoTrellisGame(AbstractNeoTrellisGame):
             [NeoTrellis(i2c_bus, False, addr=0x2E, auto_write=False), NeoTrellis(i2c_bus, False, addr=0x2F, auto_write=False)],
             [NeoTrellis(i2c_bus, False, addr=0x30, auto_write=False), NeoTrellis(i2c_bus, False, addr=0x31, auto_write=False)],
             ]
-        self.board = MultiTrellis(self.__boards)
+        self._board = MultiTrellis(self.__boards)
         print("Hardware is ready")
   
     #GIVEN
@@ -92,11 +92,11 @@ class NeoTrellisGame(AbstractNeoTrellisGame):
         for rgbValue in color:
             if rgbValue < 0 or rgbValue > 255:
                 raise ValueError(f"All RGB values in the color must be between 0 and 255 inclusive. Was {color}")
-        self.board.color(x, y, color)
+        self._board.color(x, y, color)
     
     #GIVEN
     def update_display(self):
-        self.board.show()
+        self._board.show()
 
     def clear_board(self):
         """Clears board by turning off all LEDs"""
@@ -106,10 +106,10 @@ class NeoTrellisGame(AbstractNeoTrellisGame):
         self.update_display()
 
     def sync(self):
-        self.board.sync()
+        self._board.sync()
 
     def set_callback(self, x: int, y: int, callback) -> None:
-        self.board.set_callback(x, y, callback)
+        self._board.set_callback(x, y, callback)
 
     def activate_key(self, x: int, y: int, edge) -> None:
-        self.board.activate_key(x, y, edge)
+        self._board.activate_key(x, y, edge)
