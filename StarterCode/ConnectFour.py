@@ -27,15 +27,15 @@ class ConnectFour:
     
     def register_two_player_callbacks(self):
         for col in range(NUMBER_OF_GAME_COLUMNS):
-            self.game.board.set_callback(col, 0, self.handle_button_event)
-            self.game.board.activate_key(col, 0, NeoTrellis.EDGE_RISING)
+            self.game.set_callback(col, 0, self.handle_button_event)
+            self.game.activate_key(col, 0, NeoTrellis.EDGE_RISING)
 
     def register_end_game_callbacks(self):
         for col in range(NUMBER_OF_GAME_COLUMNS):
-            self.game.board.set_callback(col, 0, None)
-        self.game.board.set_callback(7, 0, self.reset_game_from_callback)
-        self.game.board.activate_key(7, 0, NeoTrellis.EDGE_RISING)
-    
+            self.game.set_callback(col, 0, None)
+        self.game.set_callback(7, 0, self.reset_game_from_callback)
+        self.game.activate_key(7, 0, NeoTrellis.EDGE_RISING)
+
     def reset_game_from_callback(self, x, y, edge):
         self.reset_game()
         self.register_two_player_callbacks()
@@ -83,7 +83,7 @@ class ConnectFour:
         for col in range(NUMBER_OF_GAME_COLUMNS):
             if self.is_column_full(col):
                 self.game.set_cell_color(col, 0, (0,0,0))
-                self.game.board.activate_key(col, 0, NeoTrellis.EDGE_RISING, False)
+                self.game.activate_key(col, 0, NeoTrellis.EDGE_RISING, False)
             else:
                 self.game.set_cell_color(col, 0, self.get_player_color(self.current_player))
         self.game.update_display()

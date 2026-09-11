@@ -34,6 +34,16 @@ class AbstractNeoTrellisGame(abc.ABC):
         """Read any events from the LED display and call callbacks if any events have occurred."""
         pass
 
+    @abc.abstractmethod
+    def set_callback(self, x: int, y: int, callback) -> None:
+        """Sets a callback function for a cell at the given coordinates."""
+        pass
+
+    @abc.abstractmethod
+    def activate_key(self, x: int, y: int, edge) -> None:
+        """Activates a key at the given coordinates for a specific edge event."""
+        pass
+
 
 class NeoTrellisGame(AbstractNeoTrellisGame):
     
@@ -97,3 +107,9 @@ class NeoTrellisGame(AbstractNeoTrellisGame):
 
     def sync(self):
         self.board.sync()
+
+    def set_callback(self, x: int, y: int, callback) -> None:
+        self.board.set_callback(x, y, callback)
+
+    def activate_key(self, x: int, y: int, edge) -> None:
+        self.board.activate_key(x, y, edge)
