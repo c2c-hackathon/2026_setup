@@ -5,6 +5,7 @@ import importlib.util
 import pathlib
 import sys
 import sysconfig
+import time
 import types
 import typing
 
@@ -33,6 +34,8 @@ _load_stdlib_code_module()
 class FakeNeoTrellisGame:
     """Fake board implementation used to exercise Connect Four without hardware."""
 
+    PRESS_DELAY_SECONDS = 0.33
+
     def __init__(self):
         self.callbacks = {}
         self.colors = {}
@@ -58,17 +61,33 @@ class FakeNeoTrellisGame:
         self.callbacks[(x, y)] = callback
 
     def activate_key(self, x, y, edge, enable=True):
-        self.key_states[(x, y)] = {"edge": edge, "enable": enable}
+        key_state = self.key_states.setdefault((x, y), {})
+        key_state["edge"] = edge
+        key_state["enable"] = enable
+        key_state[edge] = enable
 
     def press(self, x: int, y: int) -> bool:
-        """Trigger a registered key callback when that key is enabled."""
+        """Simulate a momentary press by firing FALLING then RISING events."""
         callback = self.callbacks.get((x, y))
-        key_state = self.key_states.get((x, y), {"enable": True, "edge": None})
-        if callback is None or not key_state["enable"]:
+        key_state = self.key_states.get((x, y), {})
+        if callback is None:
             return False
 
-        callback(x, y, key_state["edge"])
-        return True
+        falling_edge = getattr(sys.modules["adafruit_neotrellis.neotrellis"].NeoTrellis, "EDGE_FALLING")
+        rising_edge = getattr(sys.modules["adafruit_neotrellis.neotrellis"].NeoTrellis, "EDGE_RISING")
+        press_handled = False
+
+        if key_state.get(falling_edge, False):
+            callback(x, y, falling_edge)
+            press_handled = True
+
+        time.sleep(self.PRESS_DELAY_SECONDS)
+
+        if key_state.get(rising_edge, True):
+            callback(x, y, rising_edge)
+            press_handled = True
+
+        return press_handled
 
     def color_at(self, x, y):
         return self.colors[(x, y)]
