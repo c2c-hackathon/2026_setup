@@ -228,24 +228,26 @@ def test___three_diagonal_pieces___supported_column_pressed___diagonal_win_is_de
 
 
 TIE_ROWS = [
-    "2211221.",
-    "11221122",
-    "22112211",
-    "11221122",
-    "22112211",
-    "11221122",
+    "PPFFPPF.",
+    "FFPPFFPP",
+    "PPFFPPFF",
+    "FFPPFFPP",
+    "PPFFPPFF",
+    "FFPPFFPP",
 ]
 
 
+@pytest.mark.parametrize("current_player", ["1", "2"], ids=["player_1", "player_2"])
 def test___board_has_one_empty_cell_without_a_winner___final_column_pressed___tie_is_detected(
+    current_player,
     connect_four_module,
     game_and_board,
 ):
     game, board = game_and_board
 
-    seed_game(connect_four_module, game, TIE_ROWS, connect_four_module.CellState.PLAYER_1)
+    seed_game(connect_four_module, game, materialize_rows(TIE_ROWS, current_player), current_player)
 
     board.press(7, 0)
 
-    assert board.color_at(7, 2) == game.get_player_color(connect_four_module.CellState.PLAYER_1)
+    assert board.color_at(7, 2) == game.get_player_color(current_player)
     assert_end_game_controls(board)
