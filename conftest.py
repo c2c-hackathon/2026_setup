@@ -5,6 +5,7 @@ import importlib.util
 import pathlib
 import sys
 import sysconfig
+import threading
 import time
 import types
 import typing
@@ -34,6 +35,7 @@ _load_stdlib_code_module()
 class FakeNeoTrellisGame:
     """Fake board implementation used to exercise Connect Four without hardware."""
 
+    CALLBACK_TIMEOUT_SECONDS = 0.5
     PRESS_DELAY_SECONDS = 0.33
 
     def __init__(self):
@@ -66,6 +68,27 @@ class FakeNeoTrellisGame:
         key_state["enable"] = enable
         key_state[edge] = enable
 
+    def _invoke_callback(self, callback, x: int, y: int, edge) -> None:
+        callback_error = []
+
+        def _run_callback() -> None:
+            try:
+                callback(x, y, edge)
+            except Exception as exc:  # pragma: no cover - re-raised on caller thread.
+                callback_error.append(exc)
+
+        callback_thread = threading.Thread(target=_run_callback, daemon=True)
+        callback_thread.start()
+        callback_thread.join(self.CALLBACK_TIMEOUT_SECONDS)
+
+        if callback_thread.is_alive():
+            raise TimeoutError(
+                f"Callback for ({x}, {y}) did not finish within {self.CALLBACK_TIMEOUT_SECONDS} seconds"
+            )
+
+        if callback_error:
+            raise callback_error[0]
+
     def press(self, x: int, y: int) -> bool:
         """Simulate a momentary press by firing FALLING then RISING events."""
         callback = self.callbacks.get((x, y))
@@ -78,13 +101,13 @@ class FakeNeoTrellisGame:
         press_handled = False
 
         if key_state.get(falling_edge, False):
-            callback(x, y, falling_edge)
+            self._invoke_callback(callback, x, y, falling_edge)
             press_handled = True
 
         time.sleep(self.PRESS_DELAY_SECONDS)
 
         if key_state.get(rising_edge, True):
-            callback(x, y, rising_edge)
+            self._invoke_callback(callback, x, y, rising_edge)
             press_handled = True
 
         return press_handled
