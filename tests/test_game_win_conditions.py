@@ -34,6 +34,23 @@ def materialize_rows(rows: typing.Iterable[str], player_token: str) -> typing.Li
     return [row.translate(translation) for row in rows]
 
 
+@pytest.fixture
+def seeded_game(connect_four_module, game_and_board):
+    game, board = game_and_board
+
+    def _seeded_game(rows, player_token):
+        current_player = tests._utils.player_state(connect_four_module, player_token)
+        seed_game(
+            connect_four_module,
+            game,
+            materialize_rows(rows, player_token),
+            current_player,
+        )
+        return game, board, current_player
+
+    return _seeded_game
+
+
 def assert_end_game_controls(board):
     for column in range(7):
         assert board.callbacks[(column, 0)] is None
@@ -46,18 +63,10 @@ def assert_end_game_controls(board):
 @pytest.mark.parametrize("player_token", ["1", "2"], ids=["player_1", "player_2"])
 def test___three_pieces_in_first_column___column_pressed___vertical_win_is_detected(
     connect_four_module,
-    game_and_board,
+    seeded_game,
     player_token,
 ):
-    game, board = game_and_board
-    current_player = tests._utils.player_state(connect_four_module, player_token)
-
-    seed_game(
-        connect_four_module,
-        game,
-        materialize_rows(VERTICAL_FIRST_COLUMN_ROWS, player_token),
-        current_player,
-    )
+    game, board, current_player = seeded_game(VERTICAL_FIRST_COLUMN_ROWS, player_token)
 
     board.press(0, 0)
 
@@ -78,18 +87,10 @@ VERTICAL_MIDDLE_COLUMN_ROWS = [
 @pytest.mark.parametrize("player_token", ["1", "2"], ids=["player_1", "player_2"])
 def test___three_pieces_in_middle_column___column_pressed___vertical_win_is_detected(
     connect_four_module,
-    game_and_board,
+    seeded_game,
     player_token,
 ):
-    game, board = game_and_board
-    current_player = tests._utils.player_state(connect_four_module, player_token)
-
-    seed_game(
-        connect_four_module,
-        game,
-        materialize_rows(VERTICAL_MIDDLE_COLUMN_ROWS, player_token),
-        current_player,
-    )
+    game, board, current_player = seeded_game(VERTICAL_MIDDLE_COLUMN_ROWS, player_token)
 
     board.press(4, 0)
 
@@ -110,18 +111,10 @@ HORIZONTAL_BOTTOM_ROW_ROWS = [
 @pytest.mark.parametrize("player_token", ["1", "2"], ids=["player_1", "player_2"])
 def test___three_bottom_row_pieces___adjacent_column_pressed___horizontal_bottom_row_win_is_detected(
     connect_four_module,
-    game_and_board,
+    seeded_game,
     player_token,
 ):
-    game, board = game_and_board
-    current_player = tests._utils.player_state(connect_four_module, player_token)
-
-    seed_game(
-        connect_four_module,
-        game,
-        materialize_rows(HORIZONTAL_BOTTOM_ROW_ROWS, player_token),
-        current_player,
-    )
+    game, board, current_player = seeded_game(HORIZONTAL_BOTTOM_ROW_ROWS, player_token)
 
     board.press(3, 0)
 
@@ -142,18 +135,10 @@ HORIZONTAL_MIDDLE_ROW_ROWS = [
 @pytest.mark.parametrize("player_token", ["1", "2"], ids=["player_1", "player_2"])
 def test___three_middle_row_pieces___supported_column_pressed___horizontal_middle_row_win_is_detected(
     connect_four_module,
-    game_and_board,
+    seeded_game,
     player_token,
 ):
-    game, board = game_and_board
-    current_player = tests._utils.player_state(connect_four_module, player_token)
-
-    seed_game(
-        connect_four_module,
-        game,
-        materialize_rows(HORIZONTAL_MIDDLE_ROW_ROWS, player_token),
-        current_player,
-    )
+    game, board, current_player = seeded_game(HORIZONTAL_MIDDLE_ROW_ROWS, player_token)
 
     board.press(5, 0)
 
@@ -225,22 +210,14 @@ DIAGONAL_CASES = [
 @pytest.mark.parametrize("rows, move_column, expected_row, expected_column", DIAGONAL_CASES)
 def test___three_diagonal_pieces___supported_column_pressed___diagonal_win_is_detected(
     connect_four_module,
-    game_and_board,
+    seeded_game,
     player_token,
     rows,
     move_column,
     expected_row,
     expected_column,
 ):
-    game, board = game_and_board
-    current_player = tests._utils.player_state(connect_four_module, player_token)
-
-    seed_game(
-        connect_four_module,
-        game,
-        materialize_rows(rows, player_token),
-        current_player,
-    )
+    game, board, current_player = seeded_game(rows, player_token)
 
     board.press(move_column, 0)
 

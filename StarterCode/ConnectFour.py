@@ -215,3 +215,47 @@ class ConnectFour:
         self.game.set_cell_color(7, 0, (40, 255, 40))
         self.blink_board()
 
+
+class FakeNeoTrellisGame:
+    """Fake board implementation used to exercise Connect Four without hardware."""
+
+    def __init__(self):
+        self.callbacks = {}
+        self.colors = {}
+        self.display_updates = 0
+        self.key_states = {}
+
+    def init_hardware(self):
+        return None
+
+    def set_cell_color(self, x, y, color):
+        self.colors[(x, y)] = color
+
+    def update_display(self):
+        self.display_updates += 1
+
+    def clear_board(self):
+        self.colors.clear()
+
+    def sync(self):
+        return None
+
+    def set_callback(self, x, y, callback):
+        self.callbacks[(x, y)] = callback
+
+    def activate_key(self, x, y, edge, enable=True):
+        self.key_states[(x, y)] = {"edge": edge, "enable": enable}
+
+    def press(self, x, y):
+        """Trigger a registered key callback when that key is enabled."""
+        callback = self.callbacks.get((x, y))
+        key_state = self.key_states.get((x, y), {"enable": True, "edge": None})
+        if callback is None or not key_state["enable"]:
+            return False
+
+        callback(x, y, key_state["edge"])
+        return True
+
+    def color_at(self, x, y):
+        return self.colors[(x, y)]
+
