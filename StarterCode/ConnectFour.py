@@ -17,6 +17,7 @@ NUMBER_OF_GAME_ROWS = 6
 NUMBER_OF_GAME_COLUMNS = 8
 ROW_OFFSET = 8 - NUMBER_OF_GAME_ROWS
 NUMBER_TO_WIN = 4
+HIGHLIGHT_COLOR = (40, 255, 40)
 
 class ConnectFour:
     def __init__(self, game: typing.Optional[AbstractNeoTrellisGame] = None):
@@ -195,7 +196,7 @@ class ConnectFour:
     def highlight_winning_sequence(self, cells):
         for i in range(10):
             for cell in cells:
-                self.game.set_cell_color(cell[1], cell[0] + ROW_OFFSET, (40, 255, 40))
+                self.game.set_cell_color(cell[1], cell[0] + ROW_OFFSET, HIGHLIGHT_COLOR)
                 self.game.update_display()
             for cell in cells:
                 self.game.set_cell_color(cell[1], cell[0] + ROW_OFFSET, self.get_player_color(self.current_player))
@@ -205,13 +206,13 @@ class ConnectFour:
         self.register_end_game_callbacks()
         for col in range(NUMBER_OF_GAME_COLUMNS):
             self.game.set_cell_color(col, 0, (0, 0, 0))
-        self.game.set_cell_color(7, 0, (40, 255, 40))
+        self.game.set_cell_color(7, 0, HIGHLIGHT_COLOR)
         self.highlight_winning_sequence(winning_sequence)    
 
     def show_tie_game(self):
         self.register_end_game_callbacks()
         for col in range(NUMBER_OF_GAME_COLUMNS):
             self.game.set_cell_color(col, 0, (0, 0, 0))
-        self.game.set_cell_color(7, 0, (40, 255, 40))
+        self.game.set_cell_color(7, 0, HIGHLIGHT_COLOR)
         self.blink_board()
 

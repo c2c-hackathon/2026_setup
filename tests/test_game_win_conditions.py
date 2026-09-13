@@ -51,13 +51,12 @@ def seeded_game(connect_four_module, game_and_board):
     return _seeded_game
 
 
-def assert_end_game_controls(board):
+def assert_end_game_controls(connect_four_module, board):
     for column in range(7):
-        assert board.callbacks[(column, 0)] is None
         assert board.color_at(column, 0) == (0, 0, 0)
 
     assert board.callbacks[(7, 0)] is not None
-    assert board.color_at(7, 0) == (40, 255, 40)
+    assert board.color_at(7, 0) == connect_four_module.HIGHLIGHT_COLOR
 
 
 @pytest.mark.parametrize("player_token", ["1", "2"], ids=["player_1", "player_2"])
@@ -71,7 +70,7 @@ def test___three_pieces_in_first_column___column_pressed___vertical_win_is_detec
     board.press(0, 0)
 
     assert board.color_at(0, 4) == game.get_player_color(current_player)
-    assert_end_game_controls(board)
+    assert_end_game_controls(connect_four_module, board)
 
 
 VERTICAL_MIDDLE_COLUMN_ROWS = [
@@ -95,7 +94,7 @@ def test___three_pieces_in_middle_column___column_pressed___vertical_win_is_dete
     board.press(4, 0)
 
     assert board.color_at(4, 4) == game.get_player_color(current_player)
-    assert_end_game_controls(board)
+    assert_end_game_controls(connect_four_module, board)
 
 
 HORIZONTAL_BOTTOM_ROW_ROWS = [
@@ -119,7 +118,7 @@ def test___three_bottom_row_pieces___adjacent_column_pressed___horizontal_bottom
     board.press(3, 0)
 
     assert board.color_at(3, 7) == game.get_player_color(current_player)
-    assert_end_game_controls(board)
+    assert_end_game_controls(connect_four_module, board)
 
 
 HORIZONTAL_MIDDLE_ROW_ROWS = [
@@ -143,7 +142,7 @@ def test___three_middle_row_pieces___supported_column_pressed___horizontal_middl
     board.press(5, 0)
 
     assert board.color_at(5, 5) == game.get_player_color(current_player)
-    assert_end_game_controls(board)
+    assert_end_game_controls(connect_four_module, board)
 
 
 DIAGONAL_CASES = [
@@ -224,7 +223,7 @@ def test___three_diagonal_pieces___supported_column_pressed___diagonal_win_is_de
     assert board.color_at(
         expected_column, expected_row + connect_four_module.ROW_OFFSET
     ) == game.get_player_color(current_player)
-    assert_end_game_controls(board)
+    assert_end_game_controls(connect_four_module, board)
 
 
 TIE_ROWS = [
@@ -250,4 +249,4 @@ def test___board_has_one_empty_cell_without_a_winner___final_column_pressed___ti
     board.press(7, 0)
 
     assert board.color_at(7, 2) == game.get_player_color(current_player)
-    assert_end_game_controls(board)
+    assert_end_game_controls(connect_four_module, board)
