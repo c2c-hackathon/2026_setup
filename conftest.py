@@ -6,9 +6,12 @@ import pathlib
 import sys
 import sysconfig
 import types
+import typing
 
 import pytest
 
+if typing.TYPE_CHECKING:
+    from StarterCode import ConnectFour
 
 def _load_stdlib_code_module() -> None:
     if "code" in sys.modules:
@@ -57,7 +60,7 @@ class FakeNeoTrellisGame:
     def activate_key(self, x, y, edge, enable=True):
         self.key_states[(x, y)] = {"edge": edge, "enable": enable}
 
-    def press(self, x, y):
+    def press(self, x: int, y: int) -> bool:
         """Trigger a registered key callback when that key is enabled."""
         callback = self.callbacks.get((x, y))
         key_state = self.key_states.get((x, y), {"enable": True, "edge": None})
@@ -111,7 +114,8 @@ def _install_fake_hardware_modules():
             pass
 
     class _FakeNeoTrellis:
-        EDGE_RISING = object()
+        EDGE_RISING = object() # released
+        EDGE_FALLING = object() # pressed
 
         def __init__(self, *_args, **_kwargs):
             pass
@@ -140,7 +144,8 @@ def connect_four_module():
 
 
 @pytest.fixture
-def game_and_board(connect_four_module):
+def game_and_board(connect_four_module) -> typing.Tuple["ConnectFour.ConnectFour", FakeNeoTrellisGame]:
     board = FakeNeoTrellisGame()
+    game: ConnectFour.ConnectFour
     game = connect_four_module.ConnectFour(game=board)
     return game, board
