@@ -1,14 +1,16 @@
-from ConnectFour import ConnectFour
-from NeoTrellisGame import NeoTrellisGame
+import time
 
-game = ConnectFour()
-game.update_display()
+from ConnectFour import ConnectFour
+
+connect_four = ConnectFour()
+connect_four.game.update_display()
 while True:
     try:
-        game.board.sync()
+        connect_four.game.sync()
+        time.sleep(0.1)
     except KeyboardInterrupt:
         # clear board
         print("\nClosing game...")
-        game.clear_board()
+        connect_four.game.clear_board()
         exit()  # quit
 
