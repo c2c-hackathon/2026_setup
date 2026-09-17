@@ -106,7 +106,7 @@ class FakeNeoTrellisGame:
 
         time.sleep(self.PRESS_DELAY_SECONDS)
 
-        if key_state.get(rising_edge, True):
+        if key_state.get(rising_edge, False):
             self._invoke_callback(callback, x, y, rising_edge)
             press_handled = True
 
