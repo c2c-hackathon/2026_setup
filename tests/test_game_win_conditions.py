@@ -258,9 +258,15 @@ def test___board_has_one_empty_cell_without_a_winner___final_column_pressed___ti
 ):
     game, board = game_and_board
 
-    seed_game(connect_four_module, game, materialize_rows(TIE_ROWS, current_player), current_player)
+    current_player_state = tests._utils.player_state(connect_four_module, current_player)
+    seed_game(
+        connect_four_module,
+        game,
+        materialize_rows(TIE_ROWS, current_player),
+        current_player_state,
+    )
 
     board.press(7, 0)
 
-    assert board.color_at(7, 2) == game.get_player_color(current_player)
+    assert board.color_at(7, 2) == game.get_player_color(current_player_state)
     assert_end_game_controls(connect_four_module, board)
