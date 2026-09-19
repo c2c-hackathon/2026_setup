@@ -42,11 +42,11 @@ class ConnectFour:
         self.register_two_player_callbacks()
 
     def reset_game(self):
-        self._game_state = [] # Zero indexed: Row, Column
-        self._current_player = CellState.PLAYER_1
+        self.game_state = [] # Zero indexed: Row, Column
+        self.current_player = CellState.PLAYER_1
 
         for i in range(NUMBER_OF_GAME_ROWS):
-            self._game_state.append([CellState.EMPTY] * NUMBER_OF_GAME_COLUMNS)
+            self.game_state.append([CellState.EMPTY] * NUMBER_OF_GAME_COLUMNS)
         self.show_current_player()
         self.update_board_colors()
   
@@ -56,12 +56,12 @@ class ConnectFour:
 
     def find_lowest_empty_row(self, col: int):
         for row_index in range(NUMBER_OF_GAME_ROWS):
-            if self._game_state[NUMBER_OF_GAME_ROWS - row_index - 1][col] == CellState.EMPTY:
+            if self.game_state[NUMBER_OF_GAME_ROWS - row_index - 1][col] == CellState.EMPTY:
                 return NUMBER_OF_GAME_ROWS - row_index - 1
         return -1 # -1 means the column is full
 
     def drop_piece(self, col: int):
-        self._game_state[self.find_lowest_empty_row(col)][col] = self._current_player
+        self.game_state[self.find_lowest_empty_row(col)][col] = self.current_player
         self.update_board_colors()
         win, winning_sequence = self.check_win()
         tie = self.board_is_full()
@@ -73,10 +73,10 @@ class ConnectFour:
             self.show_tie_game()
 
     def switch_player(self):
-        if self._current_player == CellState.PLAYER_1:
-            self._current_player = CellState.PLAYER_2
+        if self.current_player == CellState.PLAYER_1:
+            self.current_player = CellState.PLAYER_2
         else:
-            self._current_player = CellState.PLAYER_1
+            self.current_player = CellState.PLAYER_1
 
         self.show_current_player()
 
@@ -86,7 +86,7 @@ class ConnectFour:
                 self.game.set_cell_color(col, 0, (0,0,0))
                 self.game.activate_key(col, 0, NeoTrellis.EDGE_RISING, False)
             else:
-                self.game.set_cell_color(col, 0, self.get_player_color(self._current_player))
+                self.game.set_cell_color(col, 0, self.get_player_color(self.current_player))
         self.game.update_display()
 
     def board_is_full(self) -> bool:
@@ -96,7 +96,7 @@ class ConnectFour:
         return True
 
     def update_board_colors(self):
-        for row_index, row in enumerate(self._game_state):
+        for row_index, row in enumerate(self.game_state):
             for col_index, col in enumerate(row):
 
                 self.game.set_cell_color(col_index, row_index + ROW_OFFSET, self.get_player_color(col))
@@ -114,7 +114,7 @@ class ConnectFour:
         pass
 
     def is_column_full(self, col: int) -> bool:
-        for row in self._game_state:
+        for row in self.game_state:
             if row[col] == CellState.EMPTY:
                 return False
         return True
@@ -123,7 +123,7 @@ class ConnectFour:
         current_col = col
         cells = []
         while current_col < NUMBER_OF_GAME_COLUMNS:
-            if self._game_state[row][current_col] == self._current_player:
+            if self.game_state[row][current_col] == self.current_player:
                 cells.append((row, current_col))
                 current_col += 1
             else:
@@ -134,7 +134,7 @@ class ConnectFour:
         current_row = row
         cells = []
         while current_row < NUMBER_OF_GAME_ROWS:
-            if self._game_state[current_row][col] == self._current_player:
+            if self.game_state[current_row][col] == self.current_player:
                 cells.append((current_row, col))
                 current_row += 1
             else:
@@ -146,7 +146,7 @@ class ConnectFour:
         current_col = col
         cells = []
         while current_row < NUMBER_OF_GAME_ROWS and current_col < NUMBER_OF_GAME_COLUMNS:
-            if self._game_state[current_row][current_col] == self._current_player:
+            if self.game_state[current_row][current_col] == self.current_player:
                 cells.append((current_row, current_col))
                 current_row += 1
                 current_col += 1
@@ -159,7 +159,7 @@ class ConnectFour:
         current_col = col
         cells = []
         while current_row >= 0 and current_col < NUMBER_OF_GAME_COLUMNS:
-            if self._game_state[current_row][current_col] == self._current_player:
+            if self.game_state[current_row][current_col] == self.current_player:
                 cells.append((current_row, current_col))
                 current_row -= 1
                 current_col += 1
@@ -171,7 +171,7 @@ class ConnectFour:
         win_checkers = [self.check_for_horizontal_win, self.check_for_vertical_win, self.check_for_diagonal_win_1, self.check_for_diagonal_win_2]
         for col_index in range(NUMBER_OF_GAME_COLUMNS):
             for row_index in range(NUMBER_OF_GAME_ROWS):
-                if self._game_state[row_index][col_index] == self._current_player:
+                if self.game_state[row_index][col_index] == self.current_player:
                     for f in win_checkers:
                         longest_sequence = f(row_index, col_index)
                         if len(longest_sequence) >= NUMBER_TO_WIN: 
@@ -190,7 +190,7 @@ class ConnectFour:
 
             for row in range(NUMBER_OF_GAME_ROWS):
                 for col in range(NUMBER_OF_GAME_COLUMNS):
-                    self.game.set_cell_color(col, row + ROW_OFFSET, self.get_player_color(self._game_state[row][col]))
+                    self.game.set_cell_color(col, row + ROW_OFFSET, self.get_player_color(self.game_state[row][col]))
                 self.game.update_display()
 
     def highlight_winning_sequence(self, cells):
@@ -199,7 +199,7 @@ class ConnectFour:
                 self.game.set_cell_color(cell[1], cell[0] + ROW_OFFSET, HIGHLIGHT_COLOR)
                 self.game.update_display()
             for cell in cells:
-                self.game.set_cell_color(cell[1], cell[0] + ROW_OFFSET, self.get_player_color(self._current_player))
+                self.game.set_cell_color(cell[1], cell[0] + ROW_OFFSET, self.get_player_color(self.current_player))
                 self.game.update_display()
 
     def show_winner(self, winning_sequence):
