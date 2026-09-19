@@ -2,7 +2,6 @@
 
 import pytest
 
-# moves: MOVES = [0, 7, 0, 7, 0, 7]
 # board state:
 # [
 #     "........",
@@ -14,7 +13,6 @@ import pytest
 # ]
 VERTICAL_FIRST_COLUMN_MOVES = [0, 7, 0, 7, 0, 7]
 
-# moves: MOVES = [4, 3, 4, 3, 4, 3]
 # board state:
 # [
 #     "........",
@@ -26,7 +24,6 @@ VERTICAL_FIRST_COLUMN_MOVES = [0, 7, 0, 7, 0, 7]
 # ]
 VERTICAL_MIDDLE_COLUMN_MOVES = [4, 3, 4, 3, 4, 3]
 
-# moves: MOVES = [2, 7, 1, 6, 0, 5]
 # board state:
 # [
 #     "........",
@@ -38,7 +35,6 @@ VERTICAL_MIDDLE_COLUMN_MOVES = [4, 3, 4, 3, 4, 3]
 # ]
 HORIZONTAL_BOTTOM_ROW_MOVES = [2, 7, 1, 6, 0, 5]
 
-# moves: MOVES = [4, 5, 5, 4, 4, 3, 2, 2, 3, 1, 3, 1, 2, 0]
 # board state:
 # [
 #     "........",
@@ -50,7 +46,6 @@ HORIZONTAL_BOTTOM_ROW_MOVES = [2, 7, 1, 6, 0, 5]
 # ]
 HORIZONTAL_MIDDLE_ROW_MOVES = [4, 5, 5, 4, 4, 3, 2, 2, 3, 1, 3, 1, 2, 0]
 
-# moves: Moves = MOVES = [7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 7, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 4, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
 # board state:
 # [
 #     "PPFFPPF.",
