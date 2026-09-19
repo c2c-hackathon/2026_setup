@@ -74,6 +74,13 @@ def replay_moves(connect_four_module, board, moves):
     return connect_four_module.CellState.PLAYER_2
 
 
+def assert_game_is_active(connect_four_module, board):
+    for column in range(7):
+        assert board.color_at(column, 0) != (0, 0, 0)
+
+    assert board.callbacks[(7, 0)] is not None
+
+
 def assert_end_game_controls(connect_four_module, board):
     for column in range(7):
         assert board.color_at(column, 0) == (0, 0, 0)
@@ -92,6 +99,20 @@ def test___three_pieces_in_first_column___column_pressed___vertical_win_is_detec
     board.press(0, 0)
 
     assert board.color_at(0, 4) == game.get_player_color(current_player)
+    assert_end_game_controls(connect_four_module, board)
+
+
+def test___three_pieces_in_last_column___column_pressed___vertical_win_is_detected(
+    connect_four_module,
+    game_and_board,
+):
+    game, board = game_and_board
+    replay_moves(connect_four_module, board, VERTICAL_FIRST_COLUMN_MOVES)
+    board.press(1, 0)  # player 1 misses, player 2's turn
+
+    board.press(7, 0)
+
+    assert board.color_at(7, 4) == game.get_player_color(connect_four_module.CellState.PLAYER_2)
     assert_end_game_controls(connect_four_module, board)
 
 
@@ -186,20 +207,21 @@ DIAGONAL_CASES = [
     pytest.param(
         # board state:
         # [
-        #     "........",
-        #     "........",
-        #     "........",
-        #     "....FP..",
-        #     "....FFP.",
-        #     "....FFFP",
+        #   "........",
+        #   "........",
+        #   "........",
+        #   "....FP..",
+        #   "....PFP.",
+        #   "P...FFFP",
         # ]
-        [7, 6, 6, 5, 0, 5, 5, 4, 0, 4, 0, 4],
+        [7, 6, 6, 5, 0, 5, 5, 4, 4, 4],
         4,
         2,
         4,
         id="descending-right-edge",
     ),
     pytest.param(
+        # Foe wins case
         # board state:
         # [
         #     "........",
@@ -229,6 +251,7 @@ def test___three_diagonal_pieces___supported_column_pressed___diagonal_win_is_de
 ):
     game, board = game_and_board
     current_player = replay_moves(connect_four_module, board, moves)
+    assert_game_is_active(connect_four_module, board)
 
     board.press(move_column, 0)
 

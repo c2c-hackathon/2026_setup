@@ -16,12 +16,12 @@ FOLLOWER = "F"
 TOKENS = {EMPTY, PLAYER, FOLLOWER}
 
 GAME_STATE = [
-    "PPFFPPF.",
-    "FFPPFFPP",
-    "PPFFPPFF",
-    "FFPPFFPP",
-    "PPFFPPFF",
-    "FFPPFFPP",
+    "........",
+    "........",
+    "........",
+    "....FP..",
+    "....PFP.",
+    "P...FFFP",
 ]
 
 STARTING_PLAYER = PLAYER
@@ -38,8 +38,7 @@ def normalize_board(rows: typing.Sequence[str]) -> Board:
     for row_index, row in enumerate(rows):
         if len(row) != COLUMNS:
             raise ValueError(
-                "GAME_STATE row %s must contain exactly %s columns"
-                % (row_index, COLUMNS)
+                "GAME_STATE row %s must contain exactly %s columns" % (row_index, COLUMNS)
             )
         invalid_tokens = sorted(set(row) - TOKENS)
         if invalid_tokens:
@@ -66,8 +65,7 @@ def validate_gravity(board: Board) -> None:
             else:
                 if found_empty:
                     raise ValueError(
-                        "Column %s violates gravity: checker above an empty cell"
-                        % column
+                        "Column %s violates gravity: checker above an empty cell" % column
                     )
 
 
@@ -107,8 +105,7 @@ def has_winning_line(board: Board, player: str) -> bool:
                 if all(
                     0 <= row + row_step * offset < ROWS
                     and 0 <= column + column_step * offset < COLUMNS
-                    and board[row + row_step * offset][column + column_step * offset]
-                    == player
+                    and board[row + row_step * offset][column + column_step * offset] == player
                     for offset in range(CONNECT_LENGTH)
                 ):
                     return True
