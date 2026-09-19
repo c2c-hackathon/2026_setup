@@ -72,14 +72,14 @@ def test___three_pieces_in_first_column___column_pressed___vertical_win_is_detec
     assert board.color_at(0, 4) == game.get_player_color(current_player)
     assert_end_game_controls(connect_four_module, board)
 
-
+# moves: MOVES = [4, 3, 4, 3, 4, 3]
 VERTICAL_MIDDLE_COLUMN_ROWS = [
     "........",
     "........",
     "........",
-    "....P...",
-    "....P...",
-    "....P...",
+    "...FP...",
+    "...FP...",
+    "...FP...",
 ]
 
 
@@ -97,13 +97,14 @@ def test___three_pieces_in_middle_column___column_pressed___vertical_win_is_dete
     assert_end_game_controls(connect_four_module, board)
 
 
+# moves: MOVES = [2, 7, 1, 6, 0, 5]
 HORIZONTAL_BOTTOM_ROW_ROWS = [
     "........",
     "........",
     "........",
     "........",
     "........",
-    "PPP.....",
+    "PPP..FFF",
 ]
 
 
@@ -121,13 +122,14 @@ def test___three_bottom_row_pieces___adjacent_column_pressed___horizontal_bottom
     assert_end_game_controls(connect_four_module, board)
 
 
+# moves: MOVES = [4, 5, 5, 4, 4, 3, 2, 2, 3, 1, 3, 1, 2]
 HORIZONTAL_MIDDLE_ROW_ROWS = [
     "........",
     "........",
     "........",
     "..PPP...",
-    "..FPFP..",
-    "..PFPF..",
+    ".FFPFP..",
+    ".FPFPF..",
 ]
 
 
@@ -146,6 +148,7 @@ def test___three_middle_row_pieces___supported_column_pressed___horizontal_middl
 
 
 DIAGONAL_CASES = [
+    # moves: MOVES = [7, 2, 1, 1, 3, 0, 2, 0, 1, 0]
     pytest.param(
         [
             "........",
@@ -153,41 +156,44 @@ DIAGONAL_CASES = [
             "........",
             "FP......",
             "FFP.....",
-            "FFFP....",
+            "FPFP...P",
         ],
         0,
         2,
         0,
         id="descending-left-edge",
     ),
+    # moves: MOVES = [7, 3, 7, 2, 6, 2, 2, 1, 1, 3, 0, 3]
     pytest.param(
         [
             "........",
             "........",
             "........",
-            "..PF....",
-            ".PFF....",
-            "PFFF....",
+            "..PF...P",
+            ".PFF...P",
+            "PFFF...P",
         ],
         3,
         2,
         3,
         id="ascending-left-edge",
     ),
+    # moves: MOVES = [7, 4, 7, 3, 7, 3, 5, 2, 4, 2, 3, 2]
     pytest.param(
         [
             "........",
             "........",
             "........",
-            "..FP....",
-            "..FFP...",
-            "..FFFP..",
+            "..FP...P",
+            "..FFP..P",
+            "..FFFP.P",
         ],
         2,
         2,
         2,
         id="descending-middle",
     ),
+    # moves: MOVES = [7, 6, 6, 5, 0, 5, 5, 4, 0, 4, 0, 4]
     pytest.param(
         [
             "........",
@@ -202,6 +208,7 @@ DIAGONAL_CASES = [
         4,
         id="descending-right-edge",
     ),
+    # moves: MOVES = [7, 4, 7, 4, 7, 4, 5, 3, 4, 3, 3, 2, 2, 5, 0, 5, 0, 5]
     pytest.param(
         [
             "........",
@@ -239,7 +246,7 @@ def test___three_diagonal_pieces___supported_column_pressed___diagonal_win_is_de
     ) == game.get_player_color(current_player)
     assert_end_game_controls(connect_four_module, board)
 
-
+# moves: Moves = MOVES = [7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 7, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 4, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
 TIE_ROWS = [
     "PPFFPPF.",
     "FFPPFFPP",
