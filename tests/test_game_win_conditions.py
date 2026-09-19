@@ -1,54 +1,77 @@
 """Component tests for Connect Four win and tie detection."""
 
-import typing
-
 import pytest
 
-import tests._utils
+# moves: MOVES = [0, 7, 0, 7, 0, 7]
+# board state:
+# [
+#     "........",
+#     "........",
+#     "........",
+#     "P......F",
+#     "P......F",
+#     "P......F",
+# ]
+VERTICAL_FIRST_COLUMN_MOVES = [0, 7, 0, 7, 0, 7]
 
-VERTICAL_FIRST_COLUMN_ROWS = [
-    "........",
-    "........",
-    "........",
-    "P.......",
-    "P.......",
-    "P.......",
-]
+# moves: MOVES = [4, 3, 4, 3, 4, 3]
+# board state:
+# [
+#     "........",
+#     "........",
+#     "........",
+#     "...FP...",
+#     "...FP...",
+#     "...FP...",
+# ]
+VERTICAL_MIDDLE_COLUMN_MOVES = [4, 3, 4, 3, 4, 3]
+
+# moves: MOVES = [2, 7, 1, 6, 0, 5]
+# board state:
+# [
+#     "........",
+#     "........",
+#     "........",
+#     "........",
+#     "........",
+#     "PPP..FFF",
+# ]
+HORIZONTAL_BOTTOM_ROW_MOVES = [2, 7, 1, 6, 0, 5]
+
+# moves: MOVES = [4, 5, 5, 4, 4, 3, 2, 2, 3, 1, 3, 1, 2, 0]
+# board state:
+# [
+#     "........",
+#     "........",
+#     "........",
+#     "..PPP...",
+#     ".FFPFP..",
+#     "FFPFPF..",
+# ]
+HORIZONTAL_MIDDLE_ROW_MOVES = [4, 5, 5, 4, 4, 3, 2, 2, 3, 1, 3, 1, 2, 0]
+
+# moves: Moves = MOVES = [7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 7, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 4, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+# board state:
+# [
+#     "PPFFPPF.",
+#     "FFPPFFPP",
+#     "PPFFPPFF",
+#     "FFPPFFPP",
+#     "PPFFPPFF",
+#     "FFPPFFPP",
+# ]
+TIE_MOVES = [7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 7, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 4, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
 
 
-def seed_game(connect_four_module, game, rows, current_player):
-    token_to_state = {
-        ".": connect_four_module.CellState.EMPTY,
-        "1": connect_four_module.CellState.PLAYER_1,
-        "2": connect_four_module.CellState.PLAYER_2,
-    }
-    game.game_state = [[token_to_state[cell] for cell in row] for row in rows]
-    game.current_player = current_player
-    game.update_board_colors()
-    game.show_current_player()
+def replay_moves(connect_four_module, board, moves):
+    board.PRESS_DELAY_SECONDS = 0
 
+    for column in moves:
+        assert board.press(column, 0)
 
-def materialize_rows(rows: typing.Iterable[str], player_token: str) -> typing.List[str]:
-    opponent_token = "2" if player_token == "1" else "1"
-    translation = str.maketrans({"P": player_token, "F": opponent_token})
-    return [row.translate(translation) for row in rows]
-
-
-@pytest.fixture
-def seeded_game(connect_four_module, game_and_board):
-    game, board = game_and_board
-
-    def _seeded_game(rows, player_token):
-        current_player = tests._utils.player_state(connect_four_module, player_token)
-        seed_game(
-            connect_four_module,
-            game,
-            materialize_rows(rows, player_token),
-            current_player,
-        )
-        return game, board, current_player
-
-    return _seeded_game
+    if len(moves) % 2 == 0:
+        return connect_four_module.CellState.PLAYER_1
+    return connect_four_module.CellState.PLAYER_2
 
 
 def assert_end_game_controls(connect_four_module, board):
@@ -59,37 +82,25 @@ def assert_end_game_controls(connect_four_module, board):
     assert board.color_at(7, 0) == connect_four_module.HIGHLIGHT_COLOR
 
 
-@pytest.mark.parametrize("player_token", ["1", "2"], ids=["player_1", "player_2"])
 def test___three_pieces_in_first_column___column_pressed___vertical_win_is_detected(
     connect_four_module,
-    seeded_game,
-    player_token,
+    game_and_board,
 ):
-    game, board, current_player = seeded_game(VERTICAL_FIRST_COLUMN_ROWS, player_token)
+    game, board = game_and_board
+    current_player = replay_moves(connect_four_module, board, VERTICAL_FIRST_COLUMN_MOVES)
 
     board.press(0, 0)
 
     assert board.color_at(0, 4) == game.get_player_color(current_player)
     assert_end_game_controls(connect_four_module, board)
 
-# moves: MOVES = [4, 3, 4, 3, 4, 3]
-VERTICAL_MIDDLE_COLUMN_ROWS = [
-    "........",
-    "........",
-    "........",
-    "...FP...",
-    "...FP...",
-    "...FP...",
-]
 
-
-@pytest.mark.parametrize("player_token", ["1", "2"], ids=["player_1", "player_2"])
 def test___three_pieces_in_middle_column___column_pressed___vertical_win_is_detected(
     connect_four_module,
-    seeded_game,
-    player_token,
+    game_and_board,
 ):
-    game, board, current_player = seeded_game(VERTICAL_MIDDLE_COLUMN_ROWS, player_token)
+    game, board = game_and_board
+    current_player = replay_moves(connect_four_module, board, VERTICAL_MIDDLE_COLUMN_MOVES)
 
     board.press(4, 0)
 
@@ -97,24 +108,12 @@ def test___three_pieces_in_middle_column___column_pressed___vertical_win_is_dete
     assert_end_game_controls(connect_four_module, board)
 
 
-# moves: MOVES = [2, 7, 1, 6, 0, 5]
-HORIZONTAL_BOTTOM_ROW_ROWS = [
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "PPP..FFF",
-]
-
-
-@pytest.mark.parametrize("player_token", ["1", "2"], ids=["player_1", "player_2"])
 def test___three_bottom_row_pieces___adjacent_column_pressed___horizontal_bottom_row_win_is_detected(
     connect_four_module,
-    seeded_game,
-    player_token,
+    game_and_board,
 ):
-    game, board, current_player = seeded_game(HORIZONTAL_BOTTOM_ROW_ROWS, player_token)
+    game, board = game_and_board
+    current_player = replay_moves(connect_four_module, board, HORIZONTAL_BOTTOM_ROW_MOVES)
 
     board.press(3, 0)
 
@@ -122,24 +121,12 @@ def test___three_bottom_row_pieces___adjacent_column_pressed___horizontal_bottom
     assert_end_game_controls(connect_four_module, board)
 
 
-# moves: MOVES = [4, 5, 5, 4, 4, 3, 2, 2, 3, 1, 3, 1, 2]
-HORIZONTAL_MIDDLE_ROW_ROWS = [
-    "........",
-    "........",
-    "........",
-    "..PPP...",
-    ".FFPFP..",
-    ".FPFPF..",
-]
-
-
-@pytest.mark.parametrize("player_token", ["1", "2"], ids=["player_1", "player_2"])
 def test___three_middle_row_pieces___supported_column_pressed___horizontal_middle_row_win_is_detected(
     connect_four_module,
-    seeded_game,
-    player_token,
+    game_and_board,
 ):
-    game, board, current_player = seeded_game(HORIZONTAL_MIDDLE_ROW_ROWS, player_token)
+    game, board = game_and_board
+    current_player = replay_moves(connect_four_module, board, HORIZONTAL_MIDDLE_ROW_MOVES)
 
     board.press(5, 0)
 
@@ -148,96 +135,100 @@ def test___three_middle_row_pieces___supported_column_pressed___horizontal_middl
 
 
 DIAGONAL_CASES = [
-    # moves: MOVES = [7, 2, 1, 1, 3, 0, 2, 0, 1, 0]
     pytest.param(
-        [
-            "........",
-            "........",
-            "........",
-            "FP......",
-            "FFP.....",
-            "FPFP...P",
-        ],
+        # board state:
+        # [
+        #     "........",
+        #     "........",
+        #     "........",
+        #     "FP......",
+        #     "FFP.....",
+        #     "FPFP...P",
+        # ]
+        [7, 2, 1, 1, 3, 0, 2, 0, 1, 0],
         0,
         2,
         0,
         id="descending-left-edge",
     ),
-    # moves: MOVES = [7, 3, 7, 2, 6, 2, 2, 1, 1, 3, 0, 3]
     pytest.param(
-        [
-            "........",
-            "........",
-            "........",
-            "..PF...P",
-            ".PFF...P",
-            "PFFF...P",
-        ],
+        # board state:
+        # [
+        #     "........",
+        #     "........",
+        #     "........",
+        #     "..PF...P",
+        #     ".PFF...P",
+        #     "PFFF...P",
+        # ]
+        [7, 3, 7, 2, 6, 2, 2, 1, 1, 3, 0, 3],
         3,
         2,
         3,
         id="ascending-left-edge",
     ),
-    # moves: MOVES = [7, 4, 7, 3, 7, 3, 5, 2, 4, 2, 3, 2]
     pytest.param(
-        [
-            "........",
-            "........",
-            "........",
-            "..FP...P",
-            "..FFP..P",
-            "..FFFP.P",
-        ],
+        # board state:
+        # [
+        #     "........",
+        #     "........",
+        #     "........",
+        #     "..FP...P",
+        #     "..FFP..P",
+        #     "..FFFP.P",
+        # ]
+        [7, 4, 7, 3, 7, 3, 5, 2, 4, 2, 3, 2],
         2,
         2,
         2,
         id="descending-middle",
     ),
-    # moves: MOVES = [7, 6, 6, 5, 0, 5, 5, 4, 0, 4, 0, 4]
     pytest.param(
-        [
-            "........",
-            "........",
-            "........",
-            "....FP..",
-            "....FFP.",
-            "....FFFP",
-        ],
+        # board state:
+        # [
+        #     "........",
+        #     "........",
+        #     "........",
+        #     "....FP..",
+        #     "....FFP.",
+        #     "....FFFP",
+        # ]
+        [7, 6, 6, 5, 0, 5, 5, 4, 0, 4, 0, 4],
         4,
         2,
         4,
         id="descending-right-edge",
     ),
-    # moves: MOVES = [7, 4, 7, 4, 7, 4, 5, 3, 4, 3, 3, 2, 2, 5, 0, 5, 0, 5]
     pytest.param(
-        [
-            "........",
-            "........",
-            "....PF..",
-            "...PFF..",
-            "..PFFF..",
-            "..FFFF..",
-        ],
+        # board state:
+        # [
+        #     "........",
+        #     "........",
+        #     "....P...",
+        #     "...PFF.P",
+        #     "P.PFFF.P",
+        #     "P.FFFP.P",
+        # ]
+        [7, 4, 7, 4, 7, 4, 5, 3, 4, 3, 3, 2, 2, 5, 0, 5, 0],
         5,
-        1,
+        2,
         5,
         id="ascending-middle",
     ),
 ]
 
 
-@pytest.mark.parametrize("player_token", ["1", "2"], ids=["player_1", "player_2"])
-@pytest.mark.parametrize("rows, move_column, expected_row, expected_column", DIAGONAL_CASES)
+@pytest.mark.parametrize("moves, move_column, expected_row, expected_column", DIAGONAL_CASES)
 def test___three_diagonal_pieces___supported_column_pressed___diagonal_win_is_detected(
     connect_four_module,
-    seeded_game,
-    player_token,
-    rows,
+    game_and_board,
+    moves,
     move_column,
     expected_row,
     expected_column,
 ):
-    game, board, current_player = seeded_game(rows, player_token)
+    game, board = game_and_board
+    current_player = replay_moves(connect_four_module, board, moves)
 
     board.press(move_column, 0)
 
@@ -246,34 +237,15 @@ def test___three_diagonal_pieces___supported_column_pressed___diagonal_win_is_de
     ) == game.get_player_color(current_player)
     assert_end_game_controls(connect_four_module, board)
 
-# moves: Moves = MOVES = [7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 7, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 4, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
-TIE_ROWS = [
-    "PPFFPPF.",
-    "FFPPFFPP",
-    "PPFFPPFF",
-    "FFPPFFPP",
-    "PPFFPPFF",
-    "FFPPFFPP",
-]
 
-
-@pytest.mark.parametrize("current_player", ["1", "2"], ids=["player_1", "player_2"])
 def test___board_has_one_empty_cell_without_a_winner___final_column_pressed___tie_is_detected(
-    current_player,
     connect_four_module,
     game_and_board,
 ):
     game, board = game_and_board
-
-    current_player_state = tests._utils.player_state(connect_four_module, current_player)
-    seed_game(
-        connect_four_module,
-        game,
-        materialize_rows(TIE_ROWS, current_player),
-        current_player_state,
-    )
+    current_player = replay_moves(connect_four_module, board, TIE_MOVES)
 
     board.press(7, 0)
 
-    assert board.color_at(7, 2) == game.get_player_color(current_player_state)
+    assert board.color_at(7, 2) == game.get_player_color(current_player)
     assert_end_game_controls(connect_four_module, board)
